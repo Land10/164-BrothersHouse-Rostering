@@ -5,13 +5,26 @@ import pandas as pd
 # 1. Page Configuration
 st.set_page_config(page_title="House Chores Roster", page_icon="🏠", layout="centered")
 
+# --- 🖼️ Background Settings ---
+# Replace this URL with any image you like (e.g., from Unsplash)
+bg_image_url = "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=2069&auto=format&fit=crop"
+
 # Fancy Custom CSS
-st.markdown("""
+st.markdown(f"""
     <style>
-    .stApp {
-        background: linear-gradient(180deg, #fdfbfb 0%, #ebedee 100%);
-    }
-    .stButton>button {
+    /* CORE MODIFICATION: Background Image + White Semi-transparent Overlay */
+    .stApp {{
+        /* The linear-gradient acts as a white overlay.
+           rgba(255, 255, 255, 0.75): 255 is white, 0.75 is opacity (0=transparent, 1=solid)
+        */
+        background-image: linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.75)), url("{bg_image_url}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }}
+    
+    /* Button Style */
+    .stButton>button {{
         width: 100%;
         border-radius: 15px;
         height: 4em;
@@ -22,41 +35,48 @@ st.markdown("""
         border: none;
         box-shadow: 0px 4px 15px rgba(255, 75, 75, 0.3);
         transition: all 0.3s ease;
-    }
-    .stButton>button:active {
+    }}
+    .stButton>button:active {{
         transform: scale(0.98);
-    }
-    .stTextArea textarea {
+    }}
+    
+    /* Input Areas: Semi-transparent to blend with background */
+    .stTextArea textarea {{
         border-radius: 10px !important;
         font-size: 16px !important;
-    }
-    div[data-testid="stExpander"] {
+        background-color: rgba(255, 255, 255, 0.8) !important;
+    }}
+    
+    /* Expander Container Style */
+    div[data-testid="stExpander"] {{
         border: none !important;
-        background-color: white !important;
+        background-color: rgba(255, 255, 255, 0.9) !important;
         border-radius: 15px !important;
-        box-shadow: 0px 2px 10px rgba(0,0,0,0.05);
-    }
-    .verse-card {
-        background-color: #ffffff;
+        box-shadow: 0px 4px 20px rgba(0,0,0,0.05);
+    }}
+    
+    /* Verse Card Style */
+    .verse-card {{
+        background-color: rgba(255, 255, 255, 0.9);
         border-left: 5px solid #FF4B4B;
         padding: 15px;
         border-radius: 10px;
-        box-shadow: 0px 2px 5px rgba(0,0,0,0.05);
+        box-shadow: 0px 4px 15px rgba(0,0,0,0.05);
         margin-bottom: 20px;
-    }
-    .verse-text {
+    }}
+    .verse-text {{
         font-style: italic;
         color: #333;
         font-size: 1.05em;
         margin: 0;
-    }
-    .verse-ref {
+    }}
+    .verse-ref {{
         font-weight: bold;
         color: #FF4B4B;
         margin-top: 5px;
         text-align: right;
         font-size: 0.9em;
-    }
+    }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -72,6 +92,7 @@ st.markdown("""
             background: linear-gradient(90deg, #FF4B4B, #FF8E53);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.5);
         ">
         ✨ HOUSE OF JESUS LOVER ✨
         </span>
@@ -135,11 +156,14 @@ if st.button("🚀 TAP TO PAIR", type="primary"):
         })
         
         st.success("🎉 Assignment Complete!")
+        
+        # Displaying the result table
         st.dataframe(results_df, use_container_width=True, hide_index=True)
+        
         st.balloons()
         st.info("💡 Tap the button again to reshuffle!")
 
 # Sidebar
 with st.sidebar:
     st.header("Help")
-    st.write("Ensuring the number of brothers matches the number of chores.")
+    st.write("Ensure the number of brothers matches the number of chores.")
