@@ -2,81 +2,95 @@ import streamlit as st
 import random
 import pandas as pd
 
-# 1. Page Configuration
+# 1. Page Configuration - 'centered' is best for mobile
 st.set_page_config(page_title="House Chores Roster", page_icon="🏠", layout="centered")
 
-# Custom CSS to make it "Beautiful"
+# Fancy Custom CSS for Mobile
 st.markdown("""
     <style>
-    .main {
-        background-color: #f5f7f9;
+    /* Gradient background for a fancy look */
+    .stApp {
+        background: linear-gradient(180deg, #fdfbfb 0%, #ebedee 100%);
     }
+    /* Make buttons huge and "tappable" for thumbs */
     .stButton>button {
         width: 100%;
-        border-radius: 20px;
-        height: 3em;
-        background-color: #FF4B4B;
+        border-radius: 15px;
+        height: 4em;
+        background: linear-gradient(90deg, #FF4B4B, #FF7575);
         color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+        border: none;
+        box-shadow: 0px 4px 15px rgba(255, 75, 75, 0.3);
+        transition: all 0.3s ease;
     }
-    .stTextArea>div>div>textarea {
-        background-color: #ffffff;
+    .stButton>button:active {
+        transform: scale(0.98);
+    }
+    /* Rounded input boxes */
+    .stTextArea textarea {
+        border-radius: 10px !important;
+        font-size: 16px !important; /* Prevents iOS auto-zoom */
+    }
+    /* Custom card-like containers */
+    div[data-testid="stExpander"] {
+        border: none !important;
+        background-color: white !important;
+        border-radius: 15px !important;
+        box-shadow: 0px 2px 10px rgba(0,0,0,0.05);
     }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🏠 Chores Assignment System")
-st.subheader("House of Jesus Lover!")
-st.write("Enter the names and chores below to generate a random assignment.")
+st.title("🏠 Chores System")
+st.markdown("*House of Jesus Lover!*")
 
-# 2. Input Section
-with st.container():
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown("### 👤 Brothers")
-        brothers_input = st.text_area("One name per line", 
-                                     value="Alex\nBryan\nJohn\nMin Khang\nSin Ngu\nYile\nDeng Jie\nXiu Qing\nAaron", 
-                                     height=200)
-        brothers = [name.strip() for name in brothers_input.split('\n') if name.strip()]
+# 2. Input Section - Using Expanders to save vertical space on phone screens
+with st.expander("📝 Edit Names & Tasks", expanded=True):
+    st.markdown("##### 👤 Brothers")
+    brothers_input = st.text_area("List names below", 
+                                 value="Alex\nBryan\nJohn\nMin Khang\nSin Ngu\nYile\nDeng Jie\nXiu Qing\nAaron", 
+                                 height=150,
+                                 label_visibility="collapsed")
+    
+    st.markdown("##### 🧹 Chores")
+    chores_input = st.text_area("List chores below", 
+                               value="Staircase\nBack Yard\nFront Yard\nDining Table\nMop Floor\nToilet\nInside Kitchen\nSweep Floor\nOutside Kitchen", 
+                               height=150,
+                               label_visibility="collapsed")
 
-    with col2:
-        st.markdown("### 🧹 Chores")
-        chores_input = st.text_area("One chore per line", 
-                                   value="Staircase\nBack Yard\nFront Yard\nDining Table\nMop Floor\nToilet\nInside Kitchen\nSweep Floor\nOutside Kitchen", 
-                                   height=200)
-        chores = [chore.strip() for chore in chores_input.split('\n') if chore.strip()]
+# Clean data
+brothers = [name.strip() for name in brothers_input.split('\n') if name.strip()]
+chores = [chore.strip() for chore in chores_input.split('\n') if chore.strip()]
 
 st.divider()
 
 # 3. Action Section
-st.info("💡 **Tip:** If you aren't satisfied with the result, just click the **'Start to Pair'** button again to reshuffle!")
-
-if st.button("🚀 Start to Pair", type="primary"):
+if st.button("🚀 TAP TO PAIR", type="primary"):
     if len(brothers) != len(chores):
-        st.error(f"⚠️ **Mismatch Found!** You have **{len(brothers)}** brothers but **{len(chores)}** chores. Please balance the numbers.")
-    elif len(brothers) == 0:
-        st.warning("Please enter names and chores first.")
+        st.error(f"⚠️ **Count Mismatch!**\n\nBrothers: {len(brothers)} | Chores: {len(chores)}")
+    elif not brothers:
+        st.warning("Please enter some names first!")
     else:
-        # Shuffle logic
-        shuffled_chores = chores.copy()
+        # Fresh shuffle logic
+        shuffled_chores = list(chores)
         random.shuffle(shuffled_chores)
         
-        # Combine into a DataFrame for better display
         results_df = pd.DataFrame({
             "Brother": brothers,
-            "Assigned Chore": shuffled_chores
+            "Task": shuffled_chores
         })
         
-        st.success("🎉 Pairing Successful!")
+        st.success("🎉 Assignment Complete!")
         
-        # Displaying with a nice UI
-        st.dataframe(results_df, use_container_width=True)
+        # 'use_container_width' ensures it fits the phone screen perfectly
+        st.dataframe(results_df, use_container_width=True, hide_index=True)
+        
         st.balloons()
+        st.info("💡 Tap the button again to reshuffle!")
 
-# Sidebar
-st.sidebar.title("Help & Support")
-st.sidebar.write("""
-1. List brothers in the left box.
-2. List tasks in the right box.
-3. Ensure the count is the same.
-4. Click Pair!
-""")
+# Sidebar for extra info
+with st.sidebar:
+    st.header("Help")
+    st.write("Ensuring the number of brothers matches the number of chores.")
