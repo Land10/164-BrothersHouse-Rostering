@@ -1,3 +1,5 @@
 streamlit
-random
 pandas
+xlsxwriter
+pulp
+openpyxl
